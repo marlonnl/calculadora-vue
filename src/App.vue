@@ -1,4 +1,60 @@
 <script setup>
+import { reactive } from 'vue';
+
+import Numeros from './components/Numeros.vue';
+import Resultado from './components/Resultado.vue';
+import Filtro from './components/Filtro.vue';
+
+	const estado = reactive ({
+		numero1: 0,
+		numero2: 0,
+		resultado: 0,
+		// soma, diminui, multiplica, divide
+		metodo: 'soma',
+	});
+
+	function calcular() {
+		const { metodo } = estado;
+
+		switch (metodo) {
+			case 'soma': {
+				return estado.resultado = (estado.numero1 + estado.numero2);
+			}
+			case 'diminui': {
+				return estado.resultado = (estado.numero1 - estado.numero2);
+			}
+			case 'multiplica': {
+				return estado.resultado = (estado.numero1 * estado.numero2);
+			}
+			case 'divide': {
+				if (estado.numero2 == 0) {
+					return estado.resultado = 'ERRO!'
+				} else {
+					return estado.resultado = (estado.numero1 / estado.numero2);
+				}
+			}
+		}
+	}
+
+	function atualizaNumero(n, novoNumero) {
+		switch (n) {
+			case 1: {
+				estado.numero1 = parseInt(novoNumero);
+				calcular();
+				break;
+			}
+			case 2: {
+				estado.numero2 = parseInt(novoNumero);
+				calcular();
+				break;
+			}
+		}
+	}
+
+	function trocarMetodo(e) {
+		estado.metodo = e.target.value;
+		calcular();
+	}
 </script>
 
 <template>
@@ -14,22 +70,22 @@
 			<hr>
 			
 			<form class="calculadora__form">
-				<div class="calculadora__form__numbers">
-					<input class="calculadora__form__input" type="number" required />
-					<input class="calculadora__form__input" type="number" required />
-				</div>
+				<Numeros
+					:numero1="estado.numero1"
+					:editnumero1="event => atualizaNumero(1, event.target.value)"
+					:numero2="estado.numero2"
+					:editnumero2="event => atualizaNumero(2, event.target.value)"
+					:calcula="calcular"
+				/>
 
-				<select class="calculadora__form__input form--select" name="operacao">
-					<option value="soma">Somar</option>
-					<option value="diminui">Subtrair</option>
-					<option value="multiplica">Multiplicar</option>
-					<option value="divide">Dividir</option>
-				</select>
+				<Filtro
+					:troca-metodo="event => trocarMetodo(event)"
+				/>
 			</form>
 
-			<p class="resultado">
-				0
-			</p>
+			<Resultado
+				:resultado="estado.resultado"
+			/>
 
 		</section>
 
@@ -76,33 +132,9 @@
 		border: none;
 	}
 
-	.calculadora__form__numbers {
-		display: flex;
-		gap: 2%
-	}
-
-	.calculadora__form__numbers > .calculadora__form__input {
-		width: 46%;
-		font-size: 48px;
-		text-align: center;
-
-		font-family: 'IMB Plex Mono', monospace;
-	}
-
 	.form--select {
 		font-size: 22px;
 		font-weight: bold;
-	}
-
-	.resultado {
-		color: #f5f5e5;
-		background-color: rgb(163, 180, 167);
-		padding: 16px;
-		margin: 8px 0 28px 0;
-		text-align: right;
-		font-size: 54px;
-		font-family: 'IMB Plex Mono', monospace;
-		border-radius: 8px;
 	}
 
 	.calculadora__header__titulo {
